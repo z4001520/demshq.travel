@@ -304,7 +304,7 @@ html:not(.go) .hero .rv.in{opacity:0;transform:translateY(26px)}
         <span><i class="fa-solid fa-plane"></i> تذاكر طيران</span><span><i class="fa-solid fa-passport"></i> تأشيرات دخول</span><span><i class="fa-solid fa-hotel"></i> فنادق فاخرة</span><span><i class="fa-solid fa-headset"></i> دعم على مدار الساعة</span>
       </div>
     </div>
-    <div class="gw" id="gw" role="img" aria-label="كرة أرضية بحدود الدول تُبرز أربيل (الفرع الرئيسي) ومسارات الرحلات منها إلى إسطنبول ودبي و روسيا و فرنسا و امريكا و ايطاليا و المغرب و تونس و مصر و السعودية وجنوب افريقيا والبرازيل و لارجنتين و الهند و الصين و بريطانيا"><canvas id="globe"></canvas><div class="gl" id="gl"></div><div class="gcap">أربيل ← إسطنبول • دبي • قطر • السعودية • الارجنتين • بريطانيا • روسيا • امريكا • الصين • اليابان • الهند • البرازيل • الارجنتين • شرم الشيخ • باكو</div></div>
+    <div class="gw" id="gw" role="img" aria-label="كرة أرضية بحدود الدول تُبرز أربيل (الفرع الرئيسي) ومسارات الرحلات منها إلى إسطنبول ودبي وكوالالمبور وشرم الشيخ وباكو"><canvas id="globe"></canvas><div class="gl" id="gl"></div><div class="gcap">أربيل ← إسطنبول • دبي • كوالالمبور • شرم الشيخ • باكو</div></div>
     <figure class="arch rv" id="archfb"><img src="https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=900&q=70" alt="إسطنبول" width="900" height="1100" fetchpriority="high"><figcaption>تركيا • الإمارات • ماليزيا</figcaption></figure>
     </div>
 
@@ -609,9 +609,29 @@ addEventListener('DOMContentLoaded',()=>{
  const rings=[0,.5].map(ph=>{const m=new T.Mesh(new T.RingGeometry(.017,.023,48),new T.MeshBasicMaterial({color:0xffd98a,transparent:true,opacity:0,side:T.DoubleSide,depthWrite:false,blending:T.AdditiveBlending}));
   m.position.copy(at(R*1.005));m.quaternion.setFromUnitVectors(Z,ev);g.add(m);return{m,ph}});
 
+ // ===== ERBIL GLOBE COUNTRY CONTROL =====
+ // Edit ONLY these two lists to control the countries visible on the Erbil globe.
+ // Use English country names exactly as provided by Natural Earth / world-atlas.
+ // VISIBLE_COUNTRIES: [] means show every country except those in HIDDEN_COUNTRIES.
+ // To show ONLY selected countries, add their names to VISIBLE_COUNTRIES.
+ // HIDDEN_COUNTRIES removes countries when VISIBLE_COUNTRIES is empty.
+ const GLOBE_COUNTRY_SETTINGS = {
+   VISIBLE_COUNTRIES: [], // Example: ['Iraq', 'Turkey', 'United Arab Emirates']
+   HIDDEN_COUNTRIES: []   // Example: ['Russia', 'China']
+ };
+ const filterGlobeCountries = tp => {
+   const visible = new Set(GLOBE_COUNTRY_SETTINGS.VISIBLE_COUNTRIES.map(x => x.trim().toLowerCase()));
+   const hidden = new Set(GLOBE_COUNTRY_SETTINGS.HIDDEN_COUNTRIES.map(x => x.trim().toLowerCase()));
+   const geometries = tp.objects.countries.geometries.filter(g => {
+     const name = String(g.properties?.name || '').trim().toLowerCase();
+     return visible.size ? visible.has(name) : !hidden.has(name);
+   });
+   return { ...tp, objects: { ...tp.objects, countries: { ...tp.objects.countries, geometries } } };
+ };
+
  // ----- real borders: appear once the Natural Earth dataset has loaded -----
  const geoL=[];let geoT=-1;
- const applyGeo=tp=>{const an=DGeo.analyse(tp),cl=DGeo.classify(an);
+ const applyGeo=source=>{const tp=filterGlobeCountries(source),an=DGeo.analyse(tp),cl=DGeo.classify(an);
   const lines=(idx,step)=>{const q=[];idx.forEach(i=>DGeo.segs(an.arcs[i],step,q));const a=new Float32Array(q.length/4*6);let k=0;
    for(let i=0;i<q.length;i+=4){const p=V(q[i+1],q[i],R*1.004),r=V(q[i+3],q[i+2],R*1.004);a[k++]=p.x;a[k++]=p.y;a[k++]=p.z;a[k++]=r.x;a[k++]=r.y;a[k++]=r.z}return a};
   const add=(arr,color,op)=>{const gm=new T.BufferGeometry();gm.setAttribute('position',new T.Float32BufferAttribute(arr,3));
