@@ -664,7 +664,7 @@ const dest = [
 ];
  const a0=V(E[0],E[1]),arcs=[],gl=$('#gl'),lab=[];
  const mk=(name,la,lo,cls,href,rad)=>{const e=document.createElement('a');e.href=href||'#tours';e.textContent=name;if(cls)e.className=cls;gl.append(e);lab.push({e,v:V(la,lo,rad||R*1.02),o:null});return e};
- const em=mk('أربيل — الفرع الرئيسي',E[0],E[1],'org main','#branches',R*1.1);
+ const em=mk('العراق',E[0],E[1],'org main','#branches',R*1.1);
  dest.forEach((d,i)=>{const b=V(d[1],d[2]),ang=a0.angleTo(b),pp=[];
   for(let k=0;k<=64;k++){const t=k/64,sn=Math.sin(ang);const v=a0.clone().multiplyScalar(Math.sin((1-t)*ang)/sn).add(b.clone().multiplyScalar(Math.sin(t*ang)/sn));pp.push(v.normalize().multiplyScalar(R+Math.sin(Math.PI*t)*.16*ang/1.5))}
   const geo=new T.BufferGeometry().setFromPoints(pp),mat=new T.LineBasicMaterial({color:0xffd98a,transparent:true,opacity:.75});
